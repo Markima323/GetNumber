@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>崩铁 2026 角色人气票数实时追踪</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="title">
+      <h1>崩铁 2026 人气票数追踪</h1>
+      <span class="subtitle">数据源：starrailawards.com · 每 {{ poll_interval }} 秒刷新</span>
+    </div>
+    <div class="status">
+      <span id="status-dot" class="dot"></span>
+      <span id="status-text">正在连接…</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <div class="filter-row">
+        <button class="pill active" data-gender="all">全部</button>
+        <button class="pill" data-gender="female">女</button>
+        <button class="pill" data-gender="male">男</button>
+        <button class="pill" data-gender="mascot">萌宠</button>
+      </div>
+      <input id="search" type="search" placeholder="搜索角色名…" autocomplete="off" />
+      <div class="quick-row">
+        <button id="select-top10">前 10</button>
+        <button id="select-none">清空</button>
+        <span id="selected-count" class="counter">已选 0</span>
+      </div>
+      <ul id="char-list" class="char-list"></ul>
+    </aside>
+
+    <section class="content">
+      <div class="chart-wrap">
+        <canvas id="chart"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    window.POLL_INTERVAL = {{ poll_interval }};
+  </script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

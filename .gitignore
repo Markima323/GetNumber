@@ -1,0 +1,20 @@
+# Local data
+votes.db
+votes.db-wal
+votes.db-shm
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Scratch
+_tmp_*

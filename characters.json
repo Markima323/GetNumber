@@ -1,0 +1,282 @@
+[
+  {
+    "id": 53,
+    "name": "缇宝",
+    "group": "A",
+    "gender": "female",
+    "image": "tibao.png"
+  },
+  {
+    "id": 39,
+    "name": "罗刹",
+    "group": "A",
+    "gender": "male",
+    "image": "luocha.png"
+  },
+  {
+    "id": 57,
+    "name": "万敌",
+    "group": "A",
+    "gender": "male",
+    "image": "wandi.png"
+  },
+  {
+    "id": 58,
+    "name": "遐蝶",
+    "group": "A",
+    "gender": "female",
+    "image": "xiadie.png"
+  },
+  {
+    "id": 4,
+    "name": "白厄",
+    "group": "A",
+    "gender": "male",
+    "image": "baie.png"
+  },
+  {
+    "id": 31,
+    "name": "卡芙卡",
+    "group": "B",
+    "gender": "female",
+    "image": "kafuka.png"
+  },
+  {
+    "id": 1,
+    "name": "阿格莱雅",
+    "group": "B",
+    "gender": "female",
+    "image": "agelaiya.png"
+  },
+  {
+    "id": 71,
+    "name": "知更鸟",
+    "group": "B",
+    "gender": "female",
+    "image": "zhigengniao.png"
+  },
+  {
+    "id": 65,
+    "name": "爻光",
+    "group": "B",
+    "gender": "female",
+    "image": "yaoguang.png"
+  },
+  {
+    "id": 10,
+    "name": "丹恒",
+    "group": "B",
+    "gender": "male",
+    "image": "danheng.png"
+  },
+  {
+    "id": 21,
+    "name": "花火",
+    "group": "C",
+    "gender": "female",
+    "image": "huahuo.png"
+  },
+  {
+    "id": 24,
+    "name": "藿藿",
+    "group": "C",
+    "gender": "female",
+    "image": "huohuo.png"
+  },
+  {
+    "id": 14,
+    "name": "风堇",
+    "group": "C",
+    "gender": "female",
+    "image": "fengjin.png"
+  },
+  {
+    "id": 51,
+    "name": "砂金",
+    "group": "C",
+    "gender": "male",
+    "image": "shajin.png"
+  },
+  {
+    "id": 42,
+    "name": "那刻夏",
+    "group": "C",
+    "gender": "male",
+    "image": "nakexia.png"
+  },
+  {
+    "id": 66,
+    "name": "银狼",
+    "group": "D",
+    "gender": "female",
+    "image": "yinlang.png"
+  },
+  {
+    "id": 9,
+    "name": "大丽花",
+    "group": "D",
+    "gender": "female",
+    "image": "dalihua.png"
+  },
+  {
+    "id": 70,
+    "name": "真理医生",
+    "group": "D",
+    "gender": "male",
+    "image": "zhenliyisheng.png"
+  },
+  {
+    "id": 28,
+    "name": "镜流",
+    "group": "D",
+    "gender": "female",
+    "image": "jingliu.png"
+  },
+  {
+    "id": 60,
+    "name": "昔涟",
+    "group": "D",
+    "gender": "female",
+    "image": "xilian.png"
+  },
+  {
+    "id": 33,
+    "name": "刻律德菈",
+    "group": "E",
+    "gender": "female",
+    "image": "kelvdela.png"
+  },
+  {
+    "id": 47,
+    "name": "阮·梅",
+    "group": "E",
+    "gender": "female",
+    "image": "ruanmei.png"
+  },
+  {
+    "id": 55,
+    "name": "托帕",
+    "group": "E",
+    "gender": "female",
+    "image": "tuopa.png"
+  },
+  {
+    "id": 37,
+    "name": "乱破",
+    "group": "E",
+    "gender": "female",
+    "image": "luanpo.png"
+  },
+  {
+    "id": 62,
+    "name": "星期日",
+    "group": "E",
+    "gender": "male",
+    "image": "xingqiri.png"
+  },
+  {
+    "id": 26,
+    "name": "椒丘",
+    "group": "F",
+    "gender": "male",
+    "image": "jiaoqiu.png"
+  },
+  {
+    "id": 22,
+    "name": "黄泉",
+    "group": "F",
+    "gender": "female",
+    "image": "huangquan.png"
+  },
+  {
+    "id": 45,
+    "name": "青雀",
+    "group": "F",
+    "gender": "female",
+    "image": "qingque.png"
+  },
+  {
+    "id": 46,
+    "name": "刃",
+    "group": "F",
+    "gender": "male",
+    "image": "ren.png"
+  },
+  {
+    "id": 19,
+    "name": "海瑟音",
+    "group": "F",
+    "gender": "female",
+    "image": "haiseyin.png"
+  },
+  {
+    "id": 40,
+    "name": "米沙",
+    "group": "G",
+    "gender": "male",
+    "image": "misha.png"
+  },
+  {
+    "id": 8,
+    "name": "不死途",
+    "group": "G",
+    "gender": "male",
+    "image": "busitu.png"
+  },
+  {
+    "id": 18,
+    "name": "黑塔",
+    "group": "G",
+    "gender": "female",
+    "image": "heita.png"
+  },
+  {
+    "id": 6,
+    "name": "波提欧",
+    "group": "G",
+    "gender": "male",
+    "image": "botiou.png"
+  },
+  {
+    "id": 12,
+    "name": "飞霄",
+    "group": "G",
+    "gender": "female",
+    "image": "feixiao.png"
+  },
+  {
+    "id": 13,
+    "name": "绯英",
+    "group": "H",
+    "gender": "female",
+    "image": "feiying.png"
+  },
+  {
+    "id": 36,
+    "name": "流萤",
+    "group": "H",
+    "gender": "female",
+    "image": "liuying.png"
+  },
+  {
+    "id": 29,
+    "name": "景元",
+    "group": "H",
+    "gender": "male",
+    "image": "jingyuan.png"
+  },
+  {
+    "id": 50,
+    "name": "三月七",
+    "group": "H",
+    "gender": "female",
+    "image": "sanyueqi.png"
+  },
+  {
+    "id": 67,
+    "name": "银枝",
+    "group": "H",
+    "gender": "male",
+    "image": "yinzhi.png"
+  }
+]

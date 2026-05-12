@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <!-- hammer.js 必须先于 chartjs-plugin-zoom 加载：拖拽平移走 Hammer.Pan -->
+  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 </head>
 <body>
   <header class="topbar">
@@ -38,6 +41,14 @@
     </aside>
 
     <section class="content">
+      <div class="chart-toolbar">
+        <div class="mode-toggle" role="tablist">
+          <button class="mode-btn active" data-mode="cumulative">累计票数</button>
+          <button class="mode-btn" data-mode="delta">增幅</button>
+        </div>
+        <span class="zoom-hint">滚轮缩放 · 拖拽平移</span>
+        <button id="reset-zoom" class="ghost-btn">重置缩放</button>
+      </div>
       <div class="chart-wrap">
         <canvas id="chart"></canvas>
       </div>

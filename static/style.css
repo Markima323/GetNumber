@@ -118,9 +118,55 @@ html, body {
 .char-count { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; }
 .char-item.hidden { display: none; }
 
-.content { padding: 14px; min-height: 0; }
+.content {
+  padding: 14px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.chart-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.mode-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.mode-btn {
+  background: var(--panel-2);
+  color: var(--text);
+  border: none;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.mode-btn + .mode-btn { border-left: 1px solid var(--border); }
+.mode-btn.active { background: var(--accent); color: white; }
+.mode-btn:hover:not(.active) { background: rgba(91, 140, 255, 0.1); }
+.zoom-hint { color: var(--muted); font-size: 11px; }
+.ghost-btn {
+  margin-left: auto;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.ghost-btn:hover { border-color: var(--accent); }
 .chart-wrap {
   background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
-  padding: 14px; height: 100%; min-height: 0;
+  padding: 14px; flex: 1; min-height: 0;
 }
-#chart { width: 100% !important; height: 100% !important; }
+#chart {
+  width: 100% !important; height: 100% !important;
+  /* Chart.js 会给 canvas 写 inline cursor，必须用 !important 才能压住 */
+  cursor: grab !important;
+}
+#chart.panning { cursor: grabbing !important; }

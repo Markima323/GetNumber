@@ -237,6 +237,16 @@ def scraper_loop(stop: threading.Event) -> None:
 
 # ---------------------------------------------------------------- web
 app = Flask(__name__, template_folder="templates", static_folder="static")
+# Dev convenience: don't cache static files, so HTML/JS/CSS edits show up
+# on a normal reload (otherwise stale assets confuse "why isn't my change live").
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+
+
+@app.after_request
+def _no_cache(resp):
+    if request.path.startswith("/static/"):
+        resp.headers["Cache-Control"] = "no-store"
+    return resp
 
 
 @app.get("/")

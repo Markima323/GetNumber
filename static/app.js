@@ -1,5 +1,21 @@
 "use strict";
 
+// ---------------------------------------------------------------- diagnostics
+// Help diagnose missing zoom plugin (most common cause: cached old HTML).
+if (typeof Chart === "undefined") {
+  console.error("[chart] Chart.js 未加载");
+} else if (!Chart.registry.plugins.get("zoom")) {
+  console.warn(
+    "[chart] zoom 插件未注册 — 检查 chartjs-plugin-zoom 是否被加载（按 Ctrl+F5 强制刷新通常能解决）",
+  );
+} else if (typeof Hammer === "undefined") {
+  console.warn(
+    "[chart] zoom 已注册但 hammer.js 未加载 — 滚轮缩放可用但鼠标拖拽平移会失效",
+  );
+} else {
+  console.log("[chart] zoom + hammer 就绪 ✓");
+}
+
 // ---------------------------------------------------------------- state
 const POLL_INTERVAL = window.POLL_INTERVAL || 10;
 const state = {
@@ -9,6 +25,7 @@ const state = {
   lastTs: new Map(),         // vote_id -> latest ts loaded
   filter: "all",
   search: "",
+  mode: localStorage.getItem("mode") || "cumulative",  // "cumulative" | "delta"
 };
 
 // ---------------------------------------------------------------- color
@@ -34,7 +51,38 @@ const chart = new Chart(ctx, {
       tooltip: {
         callbacks: {
           title: (items) => new Date(items[0].parsed.x).toLocaleString("zh-CN"),
-          label: (item) => `${item.dataset.label}: ${item.parsed.y.toLocaleString()}`,
+          label: (item) => {
+            const y = item.parsed.y;
+            if (state.mode === "delta") {
+              const sign = y >= 0 ? "+" : "";
+              return `${item.dataset.label}: ${sign}${y.toLocaleString()} 票`;
+            }
+            return `${item.dataset.label}: ${y.toLocaleString()}`;
+          },
+        },
+      },
+      zoom: {
+        pan: {
+          enabled: true,
+          mode: "xy",
+          threshold: 5,              // 抖动 5px 内当点击，不触发平移
+          onPanStart: ({ chart }) => {
+            console.log("[chart] pan start");
+            chart.canvas.classList.add("panning");
+          },
+          onPanComplete: ({ chart }) => {
+            console.log("[chart] pan end");
+            chart.canvas.classList.remove("panning");
+          },
+        },
+        zoom: {
+          wheel: { enabled: true, speed: 0.1 },
+          pinch: { enabled: true },
+          mode: "xy",
+        },
+        limits: {
+          x: { minRange: 5000 },     // 至少保留 5s 视窗
+          y: { min: 0 },             // 累计模式不允许下探到 0 以下
         },
       },
     },
@@ -46,20 +94,41 @@ const chart = new Chart(ctx, {
         grid: { color: "rgba(255,255,255,0.05)" },
       },
       y: {
-        beginAtZero: false,
-        ticks: { color: "#8a93a6", callback: (v) => v.toLocaleString() },
+        beginAtZero: true,
+        ticks: {
+          color: "#8a93a6",
+          precision: 0,                       // 累计票数为整数，默认无小数刻度
+          callback: (v) => v.toLocaleString(),
+        },
         grid: { color: "rgba(255,255,255,0.05)" },
+        title: { display: false, text: "", color: "#8a93a6" },
       },
     },
   },
 });
+
+// Convert cumulative [{x,y}, ...] into raw per-record increments.
+// 票数本身是整数，相邻记录的差值也必然是整数 — 不做时间归一化。
+function toDeltaSeries(points) {
+  if (points.length < 2) return [];
+  const out = [];
+  for (let i = 1; i < points.length; i++) {
+    out.push({ x: points[i].x, y: points[i].y - points[i - 1].y });
+  }
+  return out;
+}
+
+function getDisplayPoints(id) {
+  const raw = state.series.get(id) || [];
+  return state.mode === "delta" ? toDeltaSeries(raw) : raw;
+}
 
 function rebuildDatasets() {
   chart.data.datasets = [...state.selected].map((id) => {
     const c = state.characters.find((x) => x.id === id);
     return {
       label: c ? c.name : `#${id}`,
-      data: state.series.get(id) || [],
+      data: getDisplayPoints(id),
       borderColor: colorFor(id),
       backgroundColor: colorFor(id),
       borderWidth: 2,
@@ -69,6 +138,21 @@ function rebuildDatasets() {
       stepped: false,
     };
   });
+  const yScale = chart.options.scales.y;
+  const yLimits = chart.options.plugins.zoom.limits.y;
+  if (state.mode === "delta") {
+    // 增幅是相邻记录的票数差，依然是整数，且票数只增不减，y 也锁 0
+    yScale.ticks.precision = 0;
+    yLimits.min = 0;
+    yScale.title.display = true;
+    yScale.title.text = "新增票数";
+  } else {
+    // 累计票数：整数刻度，y 下限锁在 0
+    yScale.ticks.precision = 0;
+    yLimits.min = 0;
+    yScale.title.display = false;
+  }
+  yScale.beginAtZero = true;
   chart.update("none");
 }
 
@@ -278,8 +362,34 @@ document.getElementById("select-none").addEventListener("click", () => {
   rebuildDatasets();
 });
 
+document.querySelectorAll(".mode-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const next = btn.dataset.mode;
+    if (next === state.mode) return;
+    document.querySelectorAll(".mode-btn").forEach((b) =>
+      b.classList.toggle("active", b.dataset.mode === next),
+    );
+    state.mode = next;
+    localStorage.setItem("mode", next);
+    // Different y-scale magnitude — clear any prior zoom so the new view fits.
+    chart.resetZoom("none");
+    rebuildDatasets();
+  });
+});
+
+function syncModeButtons() {
+  document.querySelectorAll(".mode-btn").forEach((b) =>
+    b.classList.toggle("active", b.dataset.mode === state.mode),
+  );
+}
+
+document.getElementById("reset-zoom").addEventListener("click", () => {
+  chart.resetZoom();
+});
+
 // ---------------------------------------------------------------- boot
 async function boot() {
+  syncModeButtons();
   await loadCharacters();
   // Restore selection from previous session.
   try {
@@ -289,8 +399,9 @@ async function boot() {
   if (state.selected.size) {
     await loadSeries([...state.selected], 0);
     updateSelectedUI();
-    rebuildDatasets();
   }
+  // Always rebuild so the y-axis title/beginAtZero reflect the restored mode.
+  rebuildDatasets();
   updateStatus();
   setInterval(refreshAll, POLL_INTERVAL * 1000);
 }

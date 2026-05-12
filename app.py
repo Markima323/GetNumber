@@ -11,8 +11,10 @@ from __future__ import annotations
 import json
 import logging
 import sqlite3
+import sys
 import threading
 import time
+import webbrowser
 from contextlib import closing
 from pathlib import Path
 
@@ -23,8 +25,16 @@ import extract_characters
 
 # ---------------------------------------------------------------- config
 ROOT = Path(__file__).parent
-DB_PATH = ROOT / "votes.db"
-CHARACTERS_PATH = ROOT / "characters.json"
+# In a PyInstaller --onefile build, __file__ lives in a temp extraction dir
+# that's wiped at exit. Writable state (db, refreshed roster) must sit next
+# to the .exe so it survives restarts.
+if getattr(sys, "frozen", False):
+    DATA_DIR = Path(sys.executable).parent
+else:
+    DATA_DIR = ROOT
+DB_PATH = DATA_DIR / "votes.db"
+CHARACTERS_PATH = DATA_DIR / "characters.json"
+_BUNDLED_CHARACTERS = ROOT / "characters.json"   # initial snapshot inside the bundle
 
 POLL_INTERVAL = 10                          # seconds between scrapes
 ROSTER_REFRESH_INTERVAL = 3600              # re-pull characterb.js once per hour
@@ -62,9 +72,13 @@ class Roster:
         self._load_from_disk()
 
     def _load_from_disk(self) -> None:
-        if CHARACTERS_PATH.exists():
-            with CHARACTERS_PATH.open(encoding="utf-8") as f:
-                self._set(json.load(f))
+        # Prefer the writable copy beside the .exe; on first run that file
+        # doesn't exist yet, so fall back to the snapshot bundled inside.
+        for p in (CHARACTERS_PATH, _BUNDLED_CHARACTERS):
+            if p.exists():
+                with p.open(encoding="utf-8") as f:
+                    self._set(json.load(f))
+                return
 
     def _set(self, data: list[dict]) -> None:
         with self.lock:
@@ -316,6 +330,9 @@ def main() -> None:
     stop = threading.Event()
     t = threading.Thread(target=scraper_loop, args=(stop,), daemon=True, name="scraper")
     t.start()
+    if getattr(sys, "frozen", False):
+        # In the customer-facing .exe there's no console — auto-open browser.
+        threading.Timer(1.5, lambda: webbrowser.open("http://127.0.0.1:5000")).start()
     try:
         app.run(host="127.0.0.1", port=5000, debug=False, use_reloader=False)
     finally:

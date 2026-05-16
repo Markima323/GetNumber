@@ -23,8 +23,15 @@ import sys
 import urllib.request
 from pathlib import Path
 
-# characterb.js has no version query string; characterOld.js currently is v=44
-URL_CURRENT = "https://static.appoint.icu/Railvote/characterb.js"
+# The site advances through several stages, each backed by its own roster file
+# (characterb.js → second round, characterc.js → revival, characterd.js →
+# finals, etc.). Rather than hardcode the current one, we sniff index.html for
+# whichever character*.js it currently loads. characterOld.js is the all-time
+# fallback (71 entries).
+INDEX_URL = "https://www.starrailawards.com/Vote2026/index.html"
+STAGE_JS_RE = re.compile(
+    r'src="(https://static\.appoint\.icu/Railvote/character[a-z]\.js[^"]*)"'
+)
 URL_FALLBACK = "https://static.appoint.icu/Railvote/characterOld.js?v=44"
 OUT_PATH = Path(__file__).parent / "characters.json"
 
@@ -51,6 +58,23 @@ def parse(js: str) -> list[dict]:
     return json.loads(body)
 
 
+def discover_current_url() -> str:
+    """Scrape index.html for the current-stage character roster URL.
+
+    Each contest stage swaps in a different ``character[a-z].js`` file. We pick
+    the last match in the document — if multiple are referenced, the later one
+    overrides earlier ones because that's how the page's <script> tags load.
+    """
+    html = fetch(INDEX_URL)
+    matches = STAGE_JS_RE.findall(html)
+    if not matches:
+        raise RuntimeError(
+            "no character[a-z].js reference found in index.html; site layout "
+            "may have changed"
+        )
+    return matches[-1]
+
+
 def slim(data: list[dict]) -> list[dict]:
     return [
         {
@@ -72,7 +96,7 @@ def write(data: list[dict]) -> None:
 
 def fetch_current() -> list[dict]:
     """Fetch + parse the current-stage roster. Raises on any failure."""
-    return slim(parse(fetch(URL_CURRENT)))
+    return slim(parse(fetch(discover_current_url())))
 
 
 def main() -> int:
@@ -80,12 +104,15 @@ def main() -> int:
     ap.add_argument(
         "--full",
         action="store_true",
-        help="Use the all-time roster (characterOld.js, 71 entries) instead of "
-             "the current stage roster (characterb.js, ~40 entries).",
+        help="Use the all-time roster (characterOld.js, 71 entries) instead "
+             "of the current stage roster auto-detected from index.html.",
     )
     args = ap.parse_args()
 
-    url = URL_FALLBACK if args.full else URL_CURRENT
+    if args.full:
+        url = URL_FALLBACK
+    else:
+        url = discover_current_url()
     print(f"Fetching {url} ...")
     data = slim(parse(fetch(url)))
     write(data)
